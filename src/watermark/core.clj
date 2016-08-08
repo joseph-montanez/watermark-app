@@ -43,7 +43,6 @@
   [folder]
   (file-seq (io/file folder)))
 
-
 (defn calculate-watermark
   "Calculates the position and size of the watermark in relation to the image"
   [image watermark]
@@ -54,11 +53,11 @@
         height     (/ y 2)
         left       (- x (/ width 1.5))
         top        -75]
-    {:watermark watermark,
-     :image image-path,
-     :width width,
-     :height height,
-     :left left,
+    {:watermark watermark
+     :image image-path
+     :width width
+     :height height
+     :left left
      :top top}))
 
 (defn identify-width-and-height
@@ -75,13 +74,13 @@
         filename        (filename-from-path image-path)
         output-path (str "resources/processed/" filename)]
     (prn (string/join " " ["composite"
-                    "-compose" "multiply"
-                    "-gravity" "SouthWest"
-                    "-geometry" "+5+5"
-                    watermark-path
-                    image-path
-                    "-geometry" geometry-params
-                    output-path]))
+                           "-compose" "multiply"
+                           "-gravity" "SouthWest"
+                           "-geometry" "+5+5"
+                           watermark-path
+                           image-path
+                           "-geometry" geometry-params
+                           output-path]))
     (:out (shell/sh "composite"
                     "-compose" "multiply"
                     "-gravity" "SouthWest"
@@ -92,9 +91,10 @@
                     output-path))))
 
 (defn get-image-info [filename]
+  "Get the details of an image like width and height"
   (let [dimensions (identify-width-and-height filename)]
-    {:path filename,
-     :width (first dimensions),
+    {:path filename
+     :width (first dimensions)
      :height (second dimensions)}))
 
 (defn list-images-from-folder
@@ -106,7 +106,6 @@
        ; Change output to (filepath:string width:int height:int)
        (map #(get-image-info (.getAbsolutePath %)))))
 
-
 ; ENTRY
 (defn -main
   "Main application"
@@ -117,5 +116,4 @@
         images (map #(calculate-watermark % watermark-path) image-list)]
     (doall (map #(apply composite-watermark (vals %)) images)))
   (shutdown-agents))
-
 
