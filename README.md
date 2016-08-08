@@ -1,14 +1,13 @@
-# watermark
+# Watermark
 
-A Clojure library designed to ... well, that part is up to you.
+A Clojure webapp / library designed to watermark a set up images
 
 ## Usage
 
-FIXME
+Long way to go!
 
 ## License
 
-Copyright © 2016 FIXME
+Copyright © 2016 Joseph Montanez
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the MIT License
