@@ -18,6 +18,7 @@
 
 (defn read-file [file] (ByteArrayInputStream. (read-all-bytes (io/file file))))
 
+
 ; Bootstrap helpers
 (defn form-file [label name & [id]]
   (let
@@ -25,8 +26,6 @@
     [:div.form-group
      [:label {:for override-id} label]
      [:input.form-control {:type "file", :name name, :id override-id}]]))
-
-
 
 
 (defroutes app-routes
@@ -91,9 +90,9 @@
           ; Get the image details of the file
           image     (get-image-info tmpnameimg)
           ; Get the watermark path
-          mark      tmpnamemrk
+          mark      (get-image-info tmpnamemrk)
           ; Get the composition details of the image and watermark
-          composite (calculate-watermark image mark)
+          composite (calculate-watermark image mark 1/3)
           ; Convert the compsite hashmap into paramaters and append the outfile
           composite-params (concat (vals composite) [outfile])
           ; Apply the watermark to the image

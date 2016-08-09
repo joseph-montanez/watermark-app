@@ -43,17 +43,18 @@
   [folder]
   (file-seq (io/file folder)))
 
+;
 (defn calculate-watermark
   "Calculates the position and size of the watermark in relation to the image"
-  [image watermark]
-  (let [image-path (get image :path)
-        x          (get image :width)
-        y          (get image :height)
-        width      (/ x 2)
-        height     (/ y 2)
-        left       (- x (/ width 1.5))
-        top        -75]
-    {:watermark watermark
+  [image watermark watermark-ratio]
+  (let [image-path   (get image :path)
+        image-width  (get image :width)
+        image-height (get image :height)
+        width        (* image-width watermark-ratio)
+        height       (* image-height watermark-ratio)
+        left         (- image-width (/ width 1.5))
+        top          (- image-height (- image-height height))]
+    {:watermark (get watermark :path)
      :image image-path
      :width width
      :height height
@@ -112,9 +113,9 @@
   "Main application"
   [& args]
   (let [watermark-path (.getAbsolutePath watermark-file)
-        watermark-x-y (identify-width-and-height watermark-path)
+        watermark-info (get-image-info watermark-path)
         image-list (list-images-from-folder unprocessed-folder)
-        images (map #(calculate-watermark % watermark-path) image-list)]
-    (doall (map #(apply composite-watermark (vals %)) images)))
+        images (map #(calculate-watermark % watermark-info 1/2) image-list)]
+    (doall (pmap #(apply composite-watermark (vals %)) images)))
   (shutdown-agents))
 
