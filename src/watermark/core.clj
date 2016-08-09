@@ -31,7 +31,7 @@
 (defn file-ext
   "Get the extension of a file"
   [file]
-  (string/lower-case (last (string/split (.getName file) #"\."))))
+  (string/lower-case (last (string/split file #"\."))))
 
 (defn is-img
   "Check if the extension of the file matches that of an image"
@@ -68,10 +68,11 @@
 
 (defn composite-watermark
   "Put a watermark on the bottom right of the image"
-  [watermark-path image-path width height left top]
+  [watermark-path image-path width height left top & [outfile]]
+  (prn watermark-path image-path width height left top outfile)
   (let [geometry-format (cons "%dx%d+%d+%d" (map int [width height left top]))
         geometry-params (apply format geometry-format)
-        filename        (filename-from-path image-path)
+        filename        (if outfile outfile (filename-from-path image-path))
         output-path (str "resources/processed/" filename)]
     (prn (string/join " " ["composite"
                            "-compose" "multiply"
@@ -102,7 +103,7 @@
   [folder]
   (->> (list-files-from-folder folder)
        ; Make sure all items are files and the extension are of images
-       (filter #(and (.isFile %) (is-img (file-ext %))))
+       (filter #(and (.isFile %) (is-img (file-ext (.getName %)))))
        ; Change output to (filepath:string width:int height:int)
        (map #(get-image-info (.getAbsolutePath %)))))
 

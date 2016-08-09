@@ -14,18 +14,23 @@
          "<input type=submit value=Upload>"
          "</form>"))
   (POST "/" [:as r]
-    (prn r)
-    (let [file      (get-in r [:params :image :tempfile] false)
+    (let [tmpfile   (get-in r [:params :image :tempfile] false)
           ; Get the full path of the tmp file
-          filename  (.getAbsolutePath file)
+          tmpname   (.getAbsolutePath tmpfile)
+          ; Get the filename of the uploaded image
+          imagename (get-in r [:params :image :filename] false)
+          ; Generate a random output filename
+          outfile   (str (java.util.UUID/randomUUID) "." (watermark/file-ext imagename))
           ; Get the image details of the file
-          image     (watermark/get-image-info filename)
+          image     (watermark/get-image-info tmpname)
           ; Get the watermark path
           mark      (.getAbsolutePath watermark/watermark-file)
           ; Get the composition details of the image and watermark
           composite (watermark/calculate-watermark image mark)
+          ; Convert the compsite hashmap into paramaters and append the outfile
+          composite-params (concat (vals composite) [outfile])
           ; Apply the watermark to the image
-          composed  (apply watermark/composite-watermark (vals composite))]
+          composed  (apply watermark/composite-watermark composite-params)]
       (str "Uploaded: " (get-in r [:params :image :filename] false))))
   (route/not-found "<h1>Page not found</h1>"))
 
